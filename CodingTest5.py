@@ -9,6 +9,7 @@ while player not in characters:
 
 cards = random.choices(range(1, 14), k=30)
 
+win_counts = {char: 0 for char in characters}
 scores = {char: 0 for char in characters}
 rounds = 4
 
@@ -19,12 +20,12 @@ for round_num in range(1, rounds + 1):
     else:
         sorted_scores = sorted(scores.items(), key=lambda x: x[1])
         player_order = [char for char, _ in sorted_scores]
-        
+
     print(f"\n============================")
     print(f"       Round {round_num} - START ")
     print(f"============================")
     print(f"게임은 {player_order}으로 진행됩니다.\n")
-    
+
     print(f"======== Round {round_num} 플레이어가 뽑은 카드 ========")
 
     if round_num == 1:
@@ -37,6 +38,8 @@ for round_num in range(1, rounds + 1):
             scores[char] += card
     else:
         sorted_scores = sorted(scores.items(), key=lambda x: x[1])
+        highest_score = sorted_scores[-1][1]
+        highest_scoring_chars = [char for char, score in sorted_scores if score == highest_score]
         for char, _ in sorted_scores:
             print(f" {char} (현재 점수: {scores[char]}) ")
             card = cards.pop()
@@ -44,6 +47,10 @@ for round_num in range(1, rounds + 1):
             lowest_card = min(cards)
             difference = card - lowest_card
             scores[char] += difference
+
+        round_winners = [char for char in highest_scoring_chars if char in player_order]
+        for winner in round_winners:
+            win_counts[winner] += 1
 
     print(f"\n============================")
     print(f"       Round {round_num} - END ")
@@ -59,7 +66,7 @@ for round_num in range(1, rounds + 1):
 sorted_total_scores = sorted(scores.items(), key=lambda x: (-x[1], x[0]))
 
 print("===============================")
-print("      게임순위 - 총 점수 ")
+print("      게임순위 - 점수 ")
 print("===============================")
 
 grade_rank = 0
@@ -73,38 +80,21 @@ for char, score in sorted_total_scores:
     print(f"{grade_rank}등 - {char} : {score}점")
     prev_score = score
 
-# 각 캐릭터의 승리 횟수 계산
-win_counts = {char: 0 for char in characters}
-for _ in range(rounds):
-    max_score = max(scores.values())
-    winners = [char for char, score in scores.items() if score == max_score]
-    for winner in winners:
-        win_counts[winner] += 1
-        scores[winner] = -1  # 승자의 점수를 -1로 설정하여 중복 승리를 방지
 
-# 승리 횟수를 기준으로 내림차순 정렬하되, 승리 횟수가 같은 경우에는 이름 순으로 정렬
+
+
+print("===============================")
+print("      게임순위 - 승리 횟수 ")
+print("===============================")
 sorted_win_counts = sorted(win_counts.items(), key=lambda x: (-x[1], x[0]))
 
-print("==================================")
-print("      게임순위 - 총 승리 횟수 ")
-print("==================================")
+win_rank = 0
+prev_win_count = float('inf')
 
-rank = 0
-prev_count = float('inf')
-result = {}
-
-for char, count in sorted_win_counts:
-    if count < prev_count:
-        rank += 1
-    if rank in result:
-        result[rank].append(char)
-    else:
-        result[rank] = [char]
-    prev_count = count
-
-for rank, characters in result.items():
-    sorted_characters = sorted(characters)  # 이름 순으로 정렬
-    for char in sorted_characters:
-        if char == player:
-            char = "*" + char + "*"
-        print(f"{rank}등: {char} - 총 승리 횟수: {win_counts.get(char, 0)}")
+for char, win_count in sorted_win_counts:
+    if win_count < prev_win_count:
+        win_rank += 1
+    if char == player:
+        char = "*" + char + "*"
+    print(f"{win_rank}등 - {char} : {win_count}번")
+    prev_win_count = win_count
