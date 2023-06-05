@@ -15,15 +15,12 @@ rounds = 4
 for round_num in range(1, rounds + 1):
     random.shuffle(cards)
     if round_num == 1:
-        # 1라운드에서는 캐릭터 이름을 오름차순으로 정렬하여 순서대로 카드를 뽑음
         player_order = sorted(characters)
     else:
-        # 점수가 낮은 순서대로 정렬하기 위해 (캐릭터, 점수) 튜플 리스트를 생성하고, 점수에 따라 정렬
         sorted_scores = sorted(scores.items(), key=lambda x: x[1])
-        # 정렬된 캐릭터 리스트를 생성
         player_order = [char for char, _ in sorted_scores]
         
-    print(f" \n============================")
+    print(f"\n============================")
     print(f"       Round {round_num} - START ")
     print(f"============================")
     print(f"게임은 {player_order}으로 진행됩니다.\n")
@@ -48,7 +45,7 @@ for round_num in range(1, rounds + 1):
             difference = card - lowest_card
             scores[char] += difference
 
-    print(f" \n============================")
+    print(f"\n============================")
     print(f"       Round {round_num} - END ")
     print(f"============================")
     for char, score in scores.items():
@@ -57,28 +54,25 @@ for round_num in range(1, rounds + 1):
         print(f"{char}: {score}")
     print()
 
-total_scores = {char: 0 for char in characters}
-# 각 캐릭터의 총 점수 계산
-total_scores = {char: sum(scores[char] for char in scores) for char in characters}
-# 총 점수를 기준으로 내림차순 정렬하여 순위 매기기
-sorted_total_scores = sorted(total_scores.items(), key=lambda x: x[1], reverse=True)
 
-print("=============================")
+# 총 점수를 기준으로 내림차순 정렬하되, 점수가 같은 경우에는 이름 순으로 정렬
+sorted_total_scores = sorted(scores.items(), key=lambda x: (-x[1], x[0]))
+
+print("===============================")
 print("      게임순위 - 총 점수 ")
-print("=============================")
-rank = 1
-prev_score = None
+print("===============================")
+
+grade_rank = 0
+prev_score = float('inf')
+
 for char, score in sorted_total_scores:
-    if prev_score is None or score < prev_score:
-        rank += 1
+    if score < prev_score:
+        grade_rank += 1
     if char == player:
         char = "*" + char + "*"
-    print(f"{rank}등: {char} - 총 점수: {score}")
+    print(f"{grade_rank}등 - {char} : {score}점")
     prev_score = score
 
-print("==================================")
-print("      게임순위 - 승리 횟수 ")
-print("==================================")
 # 각 캐릭터의 승리 횟수 계산
 win_counts = {char: 0 for char in characters}
 for _ in range(rounds):
@@ -88,16 +82,29 @@ for _ in range(rounds):
         win_counts[winner] += 1
         scores[winner] = -1  # 승자의 점수를 -1로 설정하여 중복 승리를 방지
 
-# 승리 횟수를 기준으로 내림차순 정렬하여 순위 매기기
-sorted_win_counts = sorted(win_counts.items(), key=lambda x: x[1], reverse=True)
+# 승리 횟수를 기준으로 내림차순 정렬하되, 승리 횟수가 같은 경우에는 이름 순으로 정렬
+sorted_win_counts = sorted(win_counts.items(), key=lambda x: (-x[1], x[0]))
 
-rank = 1
-prev_count = None
+print("==================================")
+print("      게임순위 - 총 승리 횟수 ")
+print("==================================")
+
+rank = 0
+prev_count = float('inf')
+result = {}
+
 for char, count in sorted_win_counts:
-    if prev_count is None or count < prev_count:
+    if count < prev_count:
         rank += 1
-    if char == player:
-        char = "*" + char + "*"
-    print(f"{rank}등: {char} - 승리 횟수: {count}")
+    if rank in result:
+        result[rank].append(char)
+    else:
+        result[rank] = [char]
     prev_count = count
-print()
+
+for rank, characters in result.items():
+    sorted_characters = sorted(characters)  # 이름 순으로 정렬
+    for char in sorted_characters:
+        if char == player:
+            char = "*" + char + "*"
+        print(f"{rank}등: {char} - 총 승리 횟수: {win_counts.get(char, 0)}")
