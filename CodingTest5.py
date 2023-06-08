@@ -1,11 +1,11 @@
 import random
 
-characters = ["박신빈", "윤정원", "임담희", "김용현"]
-player = input("캐릭터를 선택하세요 (박신빈, 윤정원, 임담희, 김용현): ")
+characters = ["1", "2", "3", "4"]
+player = input("캐릭터 번호를 선택하세요 (1.박신빈, 2.윤정원, 3.임담희, 4.김용현): ")
 
 while player not in characters:
     print("올바른 캐릭터를 선택해주세요.")
-    player = input("캐릭터를 선택하세요 (박신빈, 윤정원, 임담희, 김용현): ")
+    player = input("캐릭터 번호를 선택하세요 (1.박신빈, 2.윤정원, 3.임담희, 4.김용현): ")
 
 cards = random.choices(range(1, 14), k=30)
 
