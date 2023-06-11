@@ -47,7 +47,7 @@ for round_num in range(1, rounds + 1):
             print(f"뽑은 카드: {card}")
             scores[char] += card
     else:
-         # 다른 플레이어들이 카드를 뽑는 순서
+        # 다른 플레이어들이 카드를 뽑는 순서
         sorted_scores = sorted(scores.items(), key=lambda x: x[1])
         highest_score = sorted_scores[-1][1]
         highest_scoring_chars = [char for char, score in sorted_scores if score == highest_score]
